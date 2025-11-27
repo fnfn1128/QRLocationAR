@@ -1,11 +1,16 @@
-package com.example.arlocationqr
+package com.example.arlocationqr.destination
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.AnimatedVisibility
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,177 +21,288 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
+import com.example.arlocationqr.MainActivity
+import com.example.arlocationqr.R
 import com.example.arlocationqr.ar.ArNavigationActivity
-import kotlinx.coroutines.launch
+
+data class Place(
+    val name: String,
+    val floor: String,
+    val description: String,
+    val imageRes: Int
+)
 
 class DestinationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            DestinationScreen()
-        }
+        setContent { DestinationSearchScreen() }
     }
 }
 
 @Composable
-fun DestinationScreen() {
-    val coroutineScope = rememberCoroutineScope()
-    val focusRequester = remember { FocusRequester() }
+fun DestinationSearchScreen() {
+
     val context = LocalContext.current
 
+    var fontSize by remember { mutableStateOf(18f) }
     var textState by remember { mutableStateOf(TextFieldValue("")) }
-    val destinations = listOf("프린트실", "회의실", "화장실")
+    var selectedPlace by remember { mutableStateOf<Place?>(null) }
     var showDialog by remember { mutableStateOf(false) }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF2C2C2E)) // ✅ 차콜 회색 배경
-            .padding(horizontal = 24.dp, vertical = 32.dp)
-    ) {
-        // ✅ 팝업 (AR 안내 시작)
-        if (showDialog) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Card(
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    modifier = Modifier
-                        .fillMaxWidth(0.9f)
-                        .wrapContentHeight()
-                        .padding(16.dp)
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(20.dp),
-                        modifier = Modifier.padding(24.dp)
-                    ) {
-                        Text(
-                            text = "AR 안내를 시작합니다.",
-                            color = Color.Black,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp,
-                            textAlign = TextAlign.Center
-                        )
+    val allPlaces = listOf(
+        Place("시네마룸", "3층", "학생들이 쉬면서 영화를 볼 수 있는 공간", R.drawable.place_cinema),
+        Place("회의실", "3층", "단체 회의를 진행할 수 있는 공간", R.drawable.place_meeting),
+        Place("프린트실", "3층", "문서 출력, 복사, 스캔 가능", R.drawable.place_print),
+        Place("사무실", "3층", "도서관 운영 관련 직원 근무 공간", R.drawable.place_office),
+        Place("화장실", "2층", "2층 도서관 외부 입구 오른편에 위치한 화장실", R.drawable.place_wc2),
+        Place("만화방", "지하 1층", "조용히 만화를 읽을 수 있는 휴식 공간", R.drawable.place_manga),
+        Place("화장실", "3층", "3층 엘리베이터 왼쪽 편에 위치한 화장실", R.drawable.place_wc3)
+    )
 
-                        // ✅ 하단 파란 확인 버튼
-                        Button(
-                            onClick = {
-                                showDialog = false
-                                // ✅ AR 화면으로 이동
-                                val intent = Intent(context, ArNavigationActivity::class.java)
-                                intent.putExtra("startZone", "A구역") // 출발지
-                                intent.putExtra("endZone", textState.text) // 선택된 목적지
-                                context.startActivity(intent)
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF007AFF)),
+    val floorOrder = listOf("3층", "2층", "지하 1층")
+
+    val filtered = remember(textState.text) {
+        if (textState.text.isBlank()) allPlaces
+        else allPlaces.filter { it.name.contains(textState.text, ignoreCase = true) }
+    }
+
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF3EFE7))
+            .padding(20.dp)
+    ) {
+
+        Column {
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    "목적지 검색",
+                    fontSize = (fontSize + 6).sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF2B3A55)
+                )
+
+                Button(
+                    onClick = { showDialog = true },
+                    colors = ButtonDefaults.buttonColors(Color(0xFF4A6FA5)),
+                    shape = RoundedCornerShape(8.dp),
+                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
+                    modifier = Modifier.height(32.dp)
+                ) {
+                    Text("홈으로", color = Color.White, fontSize = 14.sp)
+                }
+            }
+
+            Spacer(Modifier.height(14.dp))
+
+            OutlinedTextField(
+                value = textState,
+                onValueChange = { textState = it.copy(selection = TextRange(it.text.length)) },
+                placeholder = { Text("검색어를 입력하세요") },
+                modifier = Modifier.fillMaxWidth(),
+                leadingIcon = { Icon(Icons.Default.Search, null) },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFF2B3A55),
+                    unfocusedBorderColor = Color(0xFF2B3A55),
+                    cursorColor = Color(0xFF2B3A55)
+                )
+            )
+
+            Spacer(Modifier.height(14.dp))
+
+            Text("글자 크기 (${fontSize.toInt()} pt)", color = Color(0xFF2B3A55))
+            Slider(
+                value = fontSize,
+                onValueChange = { fontSize = it },
+                valueRange = 14f..26f,
+                colors = SliderDefaults.colors(
+                    thumbColor = Color(0xFF2B3A55),
+                    activeTrackColor = Color(0xFF2B3A55),
+                    inactiveTrackColor = Color(0xFF8EA3C5)
+                )
+            )
+
+            Spacer(Modifier.height(12.dp))
+
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(18.dp)) {
+
+                floorOrder.forEach { floor ->
+                    val itemsInFloor = filtered.filter { it.floor == floor }
+                    if (itemsInFloor.isEmpty()) return@forEach
+
+                    item {
+                        Text(
+                            text = floor,
+                            fontSize = (fontSize + 4).sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFF4A4A4A)
+                        )
+                    }
+
+                    items(itemsInFloor) { place ->
+
+                        Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(48.dp),
-                            shape = RoundedCornerShape(12.dp)
+                                .height(74.dp)
+                                .clickable { selectedPlace = place },
+                            shape = RoundedCornerShape(14.dp),
+                            elevation = CardDefaults.cardElevation(0.dp),
+                            colors = CardDefaults.cardColors(Color.White)
                         ) {
-                            Text("확인", fontSize = 18.sp, color = Color.White)
+                            Row(
+                                Modifier
+                                    .fillMaxSize()
+                                    .padding(10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+
+                                val thumbPainter = rememberAsyncImagePainter(place.imageRes)
+
+                                Image(
+                                    thumbPainter,
+                                    null,
+                                    modifier = Modifier
+                                        .size(56.dp)
+                                        .clip(RoundedCornerShape(12.dp))
+                                )
+
+                                Spacer(Modifier.width(14.dp))
+
+                                Text(
+                                    place.name,
+                                    fontSize = fontSize.sp,
+                                    color = Color(0xFF2B3A55)
+                                )
+                            }
                         }
                     }
                 }
             }
         }
 
-        // ✅ 메인 UI
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
+        // Blur + dim background
+        if (selectedPlace != null) {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .blur(10.dp)
+                    .background(Color(0x66000000))
+                    .clickable { selectedPlace = null }
+            )
+        }
+
+        // 팝업
+        AnimatedVisibility(
+            visible = selectedPlace != null,
             modifier = Modifier
                 .fillMaxSize()
-                .align(Alignment.TopCenter)
+                .padding(horizontal = 20.dp),
+            enter = EnterTransition.None,
+            exit = ExitTransition.None
         ) {
-            // 제목
-            Text(
-                text = "목적지 검색",
-                fontSize = 26.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
 
-            Spacer(Modifier.height(16.dp))
-
-            OutlinedTextField(
-                value = textState,
-                onValueChange = {
-                    textState = it.copy(selection = TextRange(it.text.length))
-                },
-                textStyle = LocalTextStyle.current.copy(color = Color.White),
-                placeholder = { Text("목적지 입력", color = Color.Gray) },
-                leadingIcon = {
-                    Icon(Icons.Default.Search, contentDescription = null, tint = Color.White)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color.White,
-                    unfocusedBorderColor = Color.Gray,
-                    cursorColor = Color.White
-                )
-            )
-
-            Spacer(Modifier.height(20.dp))
-
-            val filtered = remember(textState.text) {
-                if (textState.text.isBlank()) destinations
-                else destinations.filter { it.contains(textState.text, ignoreCase = true) }
-            }
-
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
-                items(filtered) { zone ->
-                    Text(
-                        text = zone,
-                        color = Color.White,
-                        fontSize = 18.sp,
+
+                selectedPlace?.let { place ->
+
+                    Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable {
-                                textState = TextFieldValue(zone, selection = TextRange(zone.length))
+                            .wrapContentHeight(),
+                        shape = RoundedCornerShape(26.dp),
+                        colors = CardDefaults.cardColors(Color.White),
+                        elevation = CardDefaults.cardElevation(0.dp)
+                    ) {
+
+                        Column(
+                            Modifier.padding(20.dp),
+                            verticalArrangement = Arrangement.spacedBy(14.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+
+                            val popupPainter = rememberAsyncImagePainter(place.imageRes)
+
+                            Image(
+                                popupPainter,
+                                null,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(170.dp)
+                                    .clip(RoundedCornerShape(20.dp))
+                            )
+
+                            Text(place.name, fontSize = (fontSize + 6).sp, fontWeight = FontWeight.Bold)
+                            Text(place.floor, fontSize = fontSize.sp, color = Color.Gray)
+                            Text(place.description, fontSize = fontSize.sp)
+
+                            Button(
+                                onClick = {
+                                    val intent = Intent(context, ArNavigationActivity::class.java)
+                                    intent.putExtra("endZone", place.name)
+                                    context.startActivity(intent)
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(Color(0xFF4A6FA5)),
+                                shape = RoundedCornerShape(14.dp)
+                            ) {
+                                Text("AR 안내 시작", color = Color.White, fontSize = (fontSize + 2).sp)
                             }
-                            .padding(vertical = 4.dp)
-                    )
+
+                            Text(
+                                "닫기",
+                                Modifier
+                                    .clickable(
+                                        interactionSource = remember { MutableInteractionSource() },
+                                        indication = null
+                                    ) { selectedPlace = null },
+                                color = Color(0xFF4A4A4A),
+                                fontSize = fontSize.sp
+                            )
+                        }
+                    }
                 }
             }
         }
 
-        // ✅ 하단 중앙 파란 버튼
-        Button(
-            onClick = {
-                if (textState.text.isNotBlank()) {
-                    coroutineScope.launch {
-                        showDialog = true
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                title = { Text("알림") },
+                text = { Text("QR을 다시 인식해야 합니다.\n홈으로 이동할까요?") },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showDialog = false
+                            val intent = Intent(context, MainActivity::class.java)
+                            context.startActivity(intent)
+                        }
+                    ) { Text("이동") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDialog = false }) {
+                        Text("취소")
                     }
                 }
-            },
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth(0.9f)
-                .height(50.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF007AFF))
-        ) {
-            Text("확인", fontSize = 18.sp, color = Color.White)
+            )
         }
     }
 }
-
-

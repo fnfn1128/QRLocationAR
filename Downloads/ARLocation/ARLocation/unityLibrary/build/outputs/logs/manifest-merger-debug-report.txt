@@ -1,0 +1,64 @@
+-- Merging decision tree log ---
+manifest
+ADDED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:2:1-31:12
+INJECTED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:2:1-31:12
+	package
+		INJECTED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml
+	xmlns:tools
+		ADDED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:3:5-51
+	xmlns:android
+		ADDED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:2:11-69
+application
+ADDED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:5:3-29:17
+	android:extractNativeLibs
+		ADDED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:6:7-39
+	android:label
+		ADDED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:7:7-39
+	android:theme
+		ADDED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:9:7-48
+	tools:replace
+		ADDED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:8:7-36
+activity#com.unity3d.player.UnityPlayerActivity
+ADDED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:12:5-27:16
+	android:screenOrientation
+		ADDED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:16:9-45
+	android:launchMode
+		ADDED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:15:9-40
+	android:hardwareAccelerated
+		ADDED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:17:9-43
+	android:exported
+		ADDED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:14:9-32
+	android:resizeableActivity
+		ADDED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:18:9-43
+	android:configChanges
+		ADDED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:19:9-190
+	android:theme
+		ADDED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:20:9-50
+	android:name
+		ADDED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:13:9-62
+meta-data#unityplayer.UnityActivity
+ADDED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:23:7-82
+	android:value
+		ADDED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:23:59-79
+	android:name
+		ADDED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:23:18-58
+meta-data#android.notch_support
+ADDED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:24:7-78
+	android:value
+		ADDED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:24:55-75
+	android:name
+		ADDED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:24:18-54
+meta-data#unity.splash-mode
+ADDED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:25:7-71
+	android:value
+		ADDED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:25:51-68
+	android:name
+		ADDED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml:25:18-50
+uses-sdk
+INJECTED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml
+INJECTED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from C:\Users\user\Downloads\ARLocation\ARLocation\unityLibrary\src\main\AndroidManifest.xml

@@ -1,0 +1,42 @@
+apply plugin: 'com.android.library'
+
+android {
+    namespace "com.unity3d.player"
+    compileSdkVersion 35
+
+    defaultConfig {
+        minSdkVersion 24
+        targetSdkVersion 35
+        versionCode 1
+        versionName '0.1'
+
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a'
+        }
+
+        consumerProguardFiles 'proguard-unity.txt'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    packagingOptions {
+        jniLibs.useLegacyPackaging = true
+        doNotStrip '*/armeabi-v7a/*.so'
+        doNotStrip '*/arm64-v8a/*.so'
+    }
+
+    aaptOptions {
+        noCompress = ['.unity3d', '.ress', '.resource', '.obb', '.bundle', '.unityexp']
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation(name: 'arcore_client', ext:'aar')
+    implementation(name: 'ARPresto', ext:'aar')
+    implementation(name: 'UnityARCore', ext:'aar')
+    implementation(name: 'unityandroidpermissions', ext:'aar')
+}

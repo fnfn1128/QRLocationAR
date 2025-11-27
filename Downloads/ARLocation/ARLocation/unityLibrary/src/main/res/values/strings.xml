@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ARLibrary</string>
+    <string name="unity_view_content_description">Unity Player View</string>
+
+    <!-- 🔥 UnityPlayerActivity가 필수로 요구하는 문자열 (없으면 0x0 크래시 발생) -->
+    <string name="game_view_content_description" translatable="false">Game view</string>
+</resources>

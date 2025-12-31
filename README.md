@@ -2,6 +2,9 @@
 > “한 걸음, 한 걸음 당신을 목적지까지”
 
 
+### 시연영상
+https://github.com/user-attachments/assets/d304b067-e631-4e6f-b857-94c118147161
+
 
 ## 프로젝트 소개
 
